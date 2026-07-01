@@ -11,12 +11,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "../components/SubmitButtons";
+import { prisma } from "../utils/db";
 
 export default async function LoginPage() {
   const session = await auth();
 
-  if (session?.user) {
-    redirect("/dashboard");
+  if (session?.user?.id) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { id: true },
+    });
+    if (user) {
+      redirect("/dashboard");
+    }
   }
   return (
     <div className="flex justify-center items-center min-h-screen w-full">
@@ -52,7 +59,7 @@ export default async function LoginPage() {
                 required
               />
             </div>
-            <SubmitButton ></SubmitButton>
+            <SubmitButton text="Submit"></SubmitButton>
           </form>
         </CardContent>
       </Card>
