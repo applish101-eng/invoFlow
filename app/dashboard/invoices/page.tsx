@@ -23,7 +23,7 @@ export default function InvoicesRoute() {
               </CardDescription>
             </div>
             <Link
-              href=""
+              href="/dashboard/invoices/create"
               className={buttonVariants({
                 className: "flex items-center  ",
                 variant: "default",

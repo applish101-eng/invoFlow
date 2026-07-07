@@ -51,7 +51,6 @@ export default async function DashboardLayout({
   const session = await requiredUser();
 
   const data = await getUser(session.user?.id as string);
-  await getUser(session.user?.id as string);
   return (
     <>
       <div className="Wrapper grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
