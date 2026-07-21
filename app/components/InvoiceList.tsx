@@ -54,16 +54,21 @@ export async function InvoiceList() {
               <TableCell>#{invoice.invoiceNumber}</TableCell>
               <TableCell>{invoice.clientName}</TableCell>
               <TableCell>
-                <CurrencyDisplay amount={invoice.total} currency={invoice.currency} />
+                <CurrencyDisplay
+                  amount={invoice.total}
+                  currency={invoice.currency}
+                />
               </TableCell>
-              <TableCell><Badge>{invoice.status}</Badge></TableCell>
+              <TableCell>
+                <Badge>{invoice.status}</Badge>
+              </TableCell>
               <TableCell>
                 {new Intl.DateTimeFormat("en-US", {
                   dateStyle: "medium",
                 }).format(invoice.createdAt)}
               </TableCell>
               <TableCell className="text-right">
-                <InvoiceActions />
+                <InvoiceActions id={invoice.id} />
               </TableCell>
             </TableRow>
           ))}

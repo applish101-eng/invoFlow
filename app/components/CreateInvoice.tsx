@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Info } from "lucide-react";
 import { SubmitButton } from "@/app/components/SubmitButtons";
 import { createInvoice } from "../actions";
 import { invoiceSchema } from "../utils/zodSchema";
@@ -29,7 +29,16 @@ import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { ErrorMessage } from "@/app/components/ErrorMessage";
 
-export default function CreateInvoice() {
+export default function CreateInvoice({
+  user,
+}: {
+  user: {
+    firstName: string | null;
+    lastName: string | null;
+    address: string | null;
+    email: string | null;
+  };
+}) {
   const [lastResult, action, isPending] = useActionState(
     createInvoice,
     undefined,
@@ -126,25 +135,41 @@ export default function CreateInvoice() {
 
             <div className="grid grid-cols-2 gap-6 mt-4">
               <div className="flex flex-col gap-2">
-                <Label>From</Label>
+                <div className="flex justify-between">
+                  {" "}
+                  <Label>From</Label>{" "}
+                  <span className=" flex items-center gap-2 text-gray-400">
+                    <Info className="size-4" /> Auto-filled from profile
+                  </span>
+                </div>
                 <div className="space-y-2">
                   <Input
                     name={fields.fromName.name}
                     key={fields.fromName.key}
+                    defaultValue={
+                      user
+                        ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+                        : ""
+                    }
                     placeholder="Your Name"
+                    disabled
                   />
                   <ErrorMessage text={fields.fromName.errors} />
                   <Input
                     name={fields.fromEmail.name}
                     key={fields.fromEmail.key}
                     type="email"
+                    defaultValue={user?.email ?? ""}
                     placeholder="Your Email"
+                    disabled
                   />
                   <ErrorMessage text={fields.fromEmail.errors} />
                   <Input
                     name={fields.fromAddress.name}
                     key={fields.fromAddress.key}
+                    defaultValue={user?.address ?? ""}
                     placeholder="Your Address"
+                    disabled
                   />
                   <ErrorMessage text={fields.fromAddress.errors} />
                 </div>
