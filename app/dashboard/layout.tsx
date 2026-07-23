@@ -19,6 +19,7 @@ import {
 import { signOut } from "@/app/utils/auth";
 import { User2 } from "lucide-react";
 import { prisma } from "@/app/utils/db";
+import ThemeToggle from "@/app/components/ThemeToggle";
 
 async function getUser(userId: string) {
   const data = await prisma.user.findUnique({
@@ -86,6 +87,7 @@ export default async function DashboardLayout({
               </SheetContent>
             </Sheet>
             <div className="flex items-center gap-2 ml-auto ">
+              <ThemeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="cursor-pointer">
                   <Button

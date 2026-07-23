@@ -6,6 +6,7 @@ import { invoiceSchema, onboardingSchema } from "./utils/zodSchema";
 import { prisma } from "./utils/db";
 import { redirect } from "next/navigation";
 import { emailClient, sender } from "./utils/mailtrap";
+import { buildInvoiceHtml } from "./utils/email";
 
 export async function onboardUser(prevState: any, formData: FormData) {
   const session = await requiredUser();
@@ -27,12 +28,11 @@ export async function onboardUser(prevState: any, formData: FormData) {
       address: submission.value.address,
     },
   });
-  await emailClient.send({
+  await emailClient.emails.send({
     from: sender,
-    to: [{ email: "applish101@gmail.com" }],
+    to: ["applish101@gmail.com"],
     subject: "Welcome to InvoFlow",
     text: "You have been onboarded successfully.",
-    category: "onboarding",
   });
   return redirect("/dashboard/invoices");
 }
@@ -69,24 +69,36 @@ export async function createInvoice(prevState: unknown, formData: FormData) {
     },
   });
 
-  await emailClient.send({
+  const dueDate = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+  }).format(
+    new Date(
+      new Date(submission.value.date).getTime() +
+        submission.value.dueDate * 86400000,
+    ),
+  );
+  const total = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(submission.value.total);
+
+  const html = buildInvoiceHtml({
+    heading: "INVOICE",
+    invoiceNumber: `#${submission.value.invoiceNumber}`,
+    clientName: submission.value.clientName,
+    fromEmail: submission.value.fromEmail,
+    dueDate,
+    currency: submission.value.currency,
+    total,
+    invoiceLink: `http://localhost:3000/api/invoice/${invoice.id}`,
+    bodyText: "Your invoice has been created. Please find the summary below.",
+  });
+
+  await emailClient.emails.send({
     from: sender,
-    to: [{ email: "applish101@gmail.com" }],
-    template_uuid: process.env.MAILTRAP_TEMPLATE_UUID!,
-    template_variables: {
-      invoiceNumber: `#${submission.value.invoiceNumber}`,
-      clientName: submission.value.clientName,
-      fromEmail: submission.value.fromEmail,
-      dueDate: new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-        new Date(new Date(submission.value.date).getTime() + submission.value.dueDate * 86400000)
-      ),
-      currency: submission.value.currency,
-      total: new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(submission.value.total),
-      invoiceLink: `http://localhost:3000//api/invoice/${invoice.id}`,
-    },
+    to: [submission.value.clientEmail],
+    subject: `Invoice #${submission.value.invoiceNumber} from InvoFlow`,
+    html,
   });
 
   return redirect("/dashboard/invoices");
@@ -129,25 +141,66 @@ export async function editInvoice(prevState: unknown, formData: FormData) {
     },
   });
 
-  await emailClient.send({
+  const dueDate = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+  }).format(
+    new Date(
+      new Date(submission.value.date).getTime() +
+        submission.value.dueDate * 86400000,
+    ),
+  );
+  const total = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(submission.value.total);
+
+  const html = buildInvoiceHtml({
+    heading: "UPDATED INVOICE",
+    invoiceNumber: `#${submission.value.invoiceNumber}`,
+    clientName: submission.value.clientName,
+    fromEmail: submission.value.fromEmail,
+    dueDate,
+    currency: submission.value.currency,
+    total,
+    invoiceLink: `http://localhost:3000/api/invoice/${invoiceId}`,
+    bodyText:
+      "Your invoice has been updated. Please find the updated summary below.",
+  });
+
+  await emailClient.emails.send({
     from: sender,
-    to: [{ email: "applish101@gmail.com" }],
-    template_uuid: process.env.MAILTRAP_UPDATE_TEMPLATE_UUID!,
-    template_variables: {
-      invoiceNumber: `#${submission.value.invoiceNumber}`,
-      clientName: submission.value.clientName,
-      fromEmail: submission.value.fromEmail,
-      dueDate: new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
-        new Date(new Date(submission.value.date).getTime() + submission.value.dueDate * 86400000)
-      ),
-      currency: submission.value.currency,
-      total: new Intl.NumberFormat("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(submission.value.total),
-      invoiceLink: `http://localhost:3000//api/invoice/${invoiceId}`,
+    to: [submission.value.clientEmail],
+    subject: `Invoice #${submission.value.invoiceNumber} has been updated`,
+    html,
+  });
+
+  return redirect("/dashboard/invoices?status=updated");
+}
+
+export async function deleteInvoice(formData: FormData) {
+  const session = await requiredUser();
+  const invoiceId = formData.get("id") as string;
+
+  await prisma.invoice.delete({
+    where: {
+      id: invoiceId,
+      userId: session.user?.id as string,
     },
   });
 
-  return redirect("/dashboard/invoices");
+  return redirect("/dashboard/invoices?status=deleted");
+}
+
+export async function markINvoiceAsPaid(formData: FormData) {
+  const session = await requiredUser();
+  const invoiceId = formData.get("id") as string;
+
+  await prisma.invoice.update({
+    where: {
+      id: invoiceId,
+      userId: session.user?.id as string,
+    },
+    data: { status: "PAID" },
+  });
+  return redirect("/dashboard/invoices?status=paid");
 }

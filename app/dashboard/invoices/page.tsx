@@ -9,9 +9,11 @@ import { InvoiceList } from "@/app/components/InvoiceList";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import ToastHandler from "@/app/components/ToastHandler";
 export default function InvoicesRoute() {
   return (
     <>
+      <ToastHandler />
       <Card>
         <CardHeader className="text-2xl font-bold">
           <div className="flex items-center justify-between">

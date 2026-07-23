@@ -14,6 +14,7 @@ import {
   Trash,
 } from "lucide-react";
 import Link from "next/link";
+import { deleteInvoice, markINvoiceAsPaid } from "@/app/actions";
 
 interface iAppProps {
   id: string;
@@ -36,28 +37,33 @@ export default function InvoiceActions({ id }: iAppProps) {
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="">
+            <Link href={`/api/invoice/${id}`} target="_blank">
               {" "}
               <DownloadCloud className="size-4 mr-1" /> Download Invoice{" "}
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="">
-              {" "}
-              <Mail className="size-4 mr-1" /> Send Reminder{" "}
-            </Link>
+            <form action={`/api/reminder/${id}`} method="POST">
+              <button type="submit" className="flex items-center w-full gap-2">
+                <Mail className="size-4" /> Send Reminder
+              </button>
+            </form>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="">
-              {" "}
-              <Trash className="size-4 mr-1" /> Delete Invoice{" "}
-            </Link>
+            <form action={deleteInvoice}>
+              <input type="hidden" name="id" value={id} />
+              <button type="submit" className="flex items-center w-full gap-2">
+                <Trash className="size-4" /> Delete Invoice
+              </button>
+            </form>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="">
-              {" "}
-              <CheckCircle className="size-4 mr-1" /> Mark as Paid{" "}
-            </Link>
+            <form action={markINvoiceAsPaid}>
+              <input type="hidden" name="id" value={id} />
+              <button type="submit" className="flex items-center w-full gap-2">
+                <CheckCircle className="size-4 mr-1" /> Mark as Paid{" "}
+              </button>
+            </form>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

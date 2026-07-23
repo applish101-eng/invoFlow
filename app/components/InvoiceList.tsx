@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableHeader,
@@ -10,7 +11,6 @@ import InvoiceActions from "./InvoiceActions";
 import { prisma } from "../utils/db";
 import { requiredUser } from "../utils/hooks";
 import { CurrencyDisplay } from "./CurrencyDisplay";
-import { Badge } from "@/components/ui/badge";
 
 export async function getData(userId: string) {
   const data = await prisma.invoice.findMany({
@@ -44,7 +44,7 @@ export async function InvoiceList() {
             <TableHead>Customer</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Due Date</TableHead>
+            <TableHead>Date</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
