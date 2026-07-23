@@ -5,11 +5,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Line, LineChart, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, XAxis, YAxis } from "recharts";
 
-type GraphData = { date: string; amount: number };
-
-export function Graph({ data }: { data: GraphData[] }) {
+interface iAppProps {
+  data: { date: string; amount: number }[];
+}
+export function Graph({ data }: iAppProps) {
   return (
     <ChartContainer
       config={{
@@ -23,17 +24,32 @@ export function Graph({ data }: { data: GraphData[] }) {
       }}
       className="min-h-[300px] w-full"
     >
-      <LineChart data={data}>
+      <AreaChart data={data}>
+        <defs>
+          <linearGradient id="fillAmount" x1="0" y1="0" x2="0" y2="1">
+            <stop
+              offset="5%"
+              style={{ stopColor: "var(--color-amount)" }}
+              stopOpacity={0.8}
+            />
+            <stop
+              offset="95%"
+              style={{ stopColor: "var(--color-amount)" }}
+              stopOpacity={0.1}
+            />
+          </linearGradient>
+        </defs>
         <XAxis dataKey="date" />
         <YAxis dataKey="amount" />
         <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
-        <Line
+        <Area
           type="monotone"
           dataKey="amount"
+          fill="url(#fillAmount)"
           stroke="var(--color-amount)"
           strokeWidth={2}
         />
-      </LineChart>
+      </AreaChart>
     </ChartContainer>
   );
 }

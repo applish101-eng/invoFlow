@@ -152,7 +152,7 @@ export default function CreateInvoice({
                         : ""
                     }
                     placeholder="Your Name"
-                    disabled
+                    
                   />
                   <ErrorMessage text={fields.fromName.errors} />
                   <Input
@@ -161,7 +161,7 @@ export default function CreateInvoice({
                     type="email"
                     defaultValue={user?.email ?? ""}
                     placeholder="Your Email"
-                    disabled
+                    
                   />
                   <ErrorMessage text={fields.fromEmail.errors} />
                   <Input
@@ -169,7 +169,7 @@ export default function CreateInvoice({
                     key={fields.fromAddress.key}
                     defaultValue={user?.address ?? ""}
                     placeholder="Your Address"
-                    disabled
+                    
                   />
                   <ErrorMessage text={fields.fromAddress.errors} />
                 </div>

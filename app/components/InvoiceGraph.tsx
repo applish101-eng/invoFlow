@@ -28,22 +28,39 @@ async function getInvoices(userId: string) {
     },
   });
 
-  const aggregatedData = rawData.reduce<Record<string, number>>((acc, curr) => {
-    const date = new Date(curr.createdAt).toLocaleDateString("en-US", {
+  const dailyTotals: { date: string; amount: number }[] = [];
+  let currentDate = "";
+  let currentTotal = 0;
+
+  for (const invoice of rawData) {
+    const dateStr = invoice.createdAt.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
-    acc[date] = (acc[date] || 0) + curr.total;
-    return acc;
-  }, {});
 
-  return Object.entries(aggregatedData).map(([date, amount]) => ({ date, amount }));
+    if (dateStr === currentDate) {
+      currentTotal += invoice.total;
+    } else {
+      if (currentDate) {
+        dailyTotals.push({ date: currentDate, amount: currentTotal });
+      }
+      currentDate = dateStr;
+      currentTotal = invoice.total;
+    }
+  }
+
+  if (currentDate) {
+    dailyTotals.push({ date: currentDate, amount: currentTotal });
+  }
+
+  return dailyTotals;
 }
+
 
 export async function InvoiceGraph() {
   const session = await requiredUser();
   const data = await getInvoices(session.user?.id as string);
-
+console.log(data);
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
