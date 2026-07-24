@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,15 +31,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster richColors closeButton />
-        </ThemeProvider>
+        {children}
+        <Toaster richColors closeButton />
       </body>
     </html>
   );

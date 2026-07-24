@@ -21,6 +21,7 @@ import { User2 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { prisma } from "@/app/utils/db";
 import ThemeToggle from "@/app/components/ThemeToggle";
+import { ThemeProvider } from "next-themes";
 
 async function getUser(userId: string) {
   const data = await prisma.user.findUnique({
@@ -55,7 +56,7 @@ export default async function DashboardLayout({
 
   const data = await getUser(session.user?.id as string);
   return (
-    <>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <div className="Wrapper grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <div className=" hidden border-r bg-muted/40 md:block">
           <div className=" flex flex-col max-h-screen h-full gap-2">
@@ -139,6 +140,6 @@ export default async function DashboardLayout({
           </main>
         </div>
       </div>
-    </>
+    </ThemeProvider>
   );
 }
