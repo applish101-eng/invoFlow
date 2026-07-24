@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/app/utils/auth";
 import { User2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { prisma } from "@/app/utils/db";
 import ThemeToggle from "@/app/components/ThemeToggle";
 
@@ -30,6 +31,7 @@ async function getUser(userId: string) {
       firstName: true,
       lastName: true,
       address: true,
+      image: true,
     },
   });
 
@@ -92,13 +94,14 @@ export default async function DashboardLayout({
                 <DropdownMenuTrigger asChild className="cursor-pointer">
                   <Button
                     variant="outline"
-                    className="w-10 h-10 p-0  rounded-full"
+                    className="w-10 h-10 p-0 rounded-full overflow-hidden"
                   >
-                    <User2
-                      // src={session.user.image || ""}
-                      // alt="Profile"
-                      className="rounded-full "
-                    />
+                    <Avatar className="size-full">
+                      <AvatarImage src={data?.image ?? undefined} />
+                      <AvatarFallback>
+                        <User2 className="size-5" />
+                      </AvatarFallback>
+                    </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -109,6 +112,9 @@ export default async function DashboardLayout({
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard/invoices">Invoices</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/profile">Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator></DropdownMenuSeparator>
                   <DropdownMenuItem asChild>

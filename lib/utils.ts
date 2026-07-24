@@ -26,3 +26,7 @@ export function formatCurrency(amount: number, currency: string) {
     }).format(amount) + ` ${currency}`;
   }
 }
+
+export function formatInvoiceNumber(num: number) {
+  return `INV-${String(num).padStart(4, "0")}`
+}

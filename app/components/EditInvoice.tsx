@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CurrencyDisplay } from "./CurrencyDisplay";
+import { formatInvoiceNumber } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -136,22 +137,18 @@ export function EditInvoice({ data, user }: iAppProps) {
                 <ErrorMessage text={fields.invoiceName.errors} />
               </div>
               <div className="grid md:grid-cols-3 gap-4 mt-6 mb-6">
-                <div className="flex flex-col gap-2">
-                  <Label>Invoice No</Label>
-                  <div className="flex">
-                    <span className="px-3 border rounded-l-md bg-muted flex items-center justify-center text-sm text-muted-foreground">
-                      #
-                    </span>
-                    <Input
-                      name={fields.invoiceNumber.name}
-                      key={fields.invoiceNumber.key}
-                      defaultValue={fields.invoiceNumber.initialValue}
-                      placeholder="e.g. 1234"
-                      className="rounded-l-none"
-                    />
+                  <div className="flex flex-col gap-2">
+                    <Label>Invoice No</Label>
+                    <div className="flex">
+                      <span className="px-3 border rounded-l-md bg-muted flex items-center justify-center text-sm text-muted-foreground">
+                        #
+                      </span>
+                      <div className="flex-1 px-3 border border-l-0 rounded-r-md bg-muted flex items-center h-10 text-sm font-mono">
+                        {formatInvoiceNumber(data.invoiceNumber)}
+                      </div>
+                    </div>
+                    <input type="hidden" name="invoiceNumber" value={data.invoiceNumber} />
                   </div>
-                  <ErrorMessage text={fields.invoiceNumber.errors} />
-                </div>
 
                 <div className="flex flex-col gap-2">
                   <Label>Currency</Label>

@@ -11,11 +11,24 @@ export const onboardingSchema = z.object({
     .min(3, { message: "Address must be at least 3 characters" }),
 });
 
+export const profileSchema = z.object({
+  firstName: z
+    .string()
+    .min(3, { message: "First name must be at least 3 characters" }),
+  lastName: z
+    .string()
+    .min(3, { message: "Last name must be at least 3 characters" }),
+  address: z
+    .string()
+    .min(3, { message: "Address must be at least 3 characters" }),
+  image: z.string().optional(),
+});
+
 export const invoiceSchema = z.object({
   invoiceName: z
     .string()
     .min(3, { message: "Invoice name must be at least 3 characters" }),
-  total: z.number().min(1, { message: "Total must be at least $1" }),
+  total: z.coerce.number().min(1, { message: "Total must be at least $1" }),
   status: z.enum(["PAID", "PENDING"]).default("PENDING"),
   date: z.string().min(1, { message: "Please select an invoice date" }),
   fromName: z
@@ -35,10 +48,33 @@ export const invoiceSchema = z.object({
     .min(3, { message: "Client address must be at least 3 characters" }),
 
   currency: z.string().min(1, "Please select a currency"),
-  dueDate: z.number().min(0, "Please select payment terms"),
-  invoiceNumber: z.coerce.number().int().positive("Invoice number must be a positive number"),
+  dueDate: z.coerce.number().min(0, "Please select payment terms"),
+  invoiceNumber: z.coerce.number().int().positive().optional(),
   note: z.string().optional(),
+  items: z.string().optional(),
   invoiceItemDescription: z.string().min(1, "Please enter an item description"),
-  invoiceItemQuantity: z.number().min(1, "Quantity must be at least 1"),
-  invoiceItemRate: z.number().min(1, "Rate must be at least $1"),
+  invoiceItemQuantity: z.coerce.number().min(1, "Quantity must be at least 1"),
+  invoiceItemRate: z.coerce.number().min(1, "Rate must be at least $1"),
+});
+
+export const templateSchema = z.object({
+  name: z.string().min(1, "Template name is required"),
+  currency: z.string().min(1, "Please select a currency"),
+  items: z.string().transform((val, ctx) => {
+    try {
+      const parsed = JSON.parse(val)
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        ctx.addIssue({ code: "custom", message: "At least one item is required" })
+        return z.NEVER
+      }
+      return parsed.map((item: any) => ({
+        description: item.description ?? "",
+        quantity: Number(item.quantity) || 1,
+        rate: Number(item.rate) || 1,
+      }))
+    } catch {
+      ctx.addIssue({ code: "custom", message: "Invalid items format" })
+      return z.NEVER
+    }
+  }),
 });

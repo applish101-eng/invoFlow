@@ -10,7 +10,26 @@ import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import ToastHandler from "@/app/components/ToastHandler";
-export default function InvoicesRoute() {
+import { requiredUser } from "@/app/utils/hooks";
+import { prisma } from "@/app/utils/db";
+
+export default async function InvoicesRoute() {
+  const session = await requiredUser();
+
+  const invoices = await prisma.invoice.findMany({
+    where: { userId: session.user?.id as string },
+    select: {
+      id: true,
+      clientName: true,
+      total: true,
+      createdAt: true,
+      status: true,
+      invoiceNumber: true,
+      currency: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
     <>
       <ToastHandler />
@@ -18,7 +37,6 @@ export default function InvoicesRoute() {
         <CardHeader className="text-2xl font-bold">
           <div className="flex items-center justify-between">
             <div>
-              {" "}
               <CardTitle className="text-2xl font-semibold">Invoices</CardTitle>
               <CardDescription className="font-normal">
                 Manage your invoices
@@ -27,17 +45,17 @@ export default function InvoicesRoute() {
             <Link
               href="/dashboard/invoices/create"
               className={buttonVariants({
-                className: "flex items-center  ",
+                className: "flex items-center",
                 variant: "default",
               })}
             >
-              <PlusIcon className="size-5" />{" "}
+              <PlusIcon className="size-5" />
               <span className="text-sm font-normal">Create Invoice</span>
             </Link>
           </div>
         </CardHeader>
         <CardContent>
-          <InvoiceList />
+          <InvoiceList invoices={JSON.parse(JSON.stringify(invoices))} />
         </CardContent>
       </Card>
     </>

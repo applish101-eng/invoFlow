@@ -1,7 +1,8 @@
 import { prisma } from "@/app/utils/db";
 import { requiredUser } from "@/app/utils/hooks";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { EditInvoice } from "@/app/components/EditInvoice";
+
 async function getData(invoiceId: string, userId: string) {
   const data = await prisma.invoice.findUnique({
     where: {
@@ -23,6 +24,11 @@ export default async function EditInvoiceRoute({ params }: { params: Params }) {
   const session = await requiredUser();
 
   const data = await getData(invoiceId, session.user?.id as string);
+
+  if (data.status === "PAID") {
+    redirect("/dashboard/invoices");
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: session.user?.id as string },
     select: { firstName: true, lastName: true, address: true, email: true },

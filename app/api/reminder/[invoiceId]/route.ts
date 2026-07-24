@@ -2,6 +2,7 @@ import { prisma } from "@/app/utils/db";
 import { emailClient, sender } from "@/app/utils/mailtrap";
 import { requiredUser } from "@/app/utils/hooks";
 import { buildInvoiceHtml } from "@/app/utils/email";
+import { formatInvoiceNumber } from "@/lib/utils";
 import { NextResponse } from "next/server";
 import { redirect } from "next/navigation";
 
@@ -31,9 +32,11 @@ export async function POST(
     maximumFractionDigits: 2,
   }).format(data.total);
 
+  const invNum = formatInvoiceNumber(data.invoiceNumber)
+
   const html = buildInvoiceHtml({
     heading: "REMINDER",
-    invoiceNumber: `#${data.invoiceNumber}`,
+    invoiceNumber: `#${invNum}`,
     clientName: data.clientName,
     fromEmail: data.fromEmail,
     dueDate: dueDateFormatted,
@@ -46,7 +49,7 @@ export async function POST(
   await emailClient.emails.send({
     from: sender,
     to: [data.clientEmail],
-    subject: `Reminder: Invoice #${data.invoiceNumber} from InvoFlow`,
+    subject: `Reminder: Invoice #${invNum} from InvoFlow`,
     html,
   });
 

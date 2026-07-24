@@ -1,6 +1,7 @@
 import { prisma } from "@/app/utils/db";
 import { NextResponse } from "next/server";
 import { jsPDF } from "jspdf";
+import { formatInvoiceNumber } from "@/lib/utils";
 
 export async function GET(
   request: Request,
@@ -45,7 +46,7 @@ export async function GET(
 
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(10);
-  pdf.text("#" + String(data.invoiceNumber), 20, y);
+  pdf.text(formatInvoiceNumber(data.invoiceNumber), 20, y);
   y += 8;
 
   pdf.setFontSize(10);
@@ -155,7 +156,7 @@ export async function GET(
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition":
-        'inline; filename="invoice-' + data.invoiceNumber + '.pdf"',
+        'inline; filename="' + formatInvoiceNumber(data.invoiceNumber) + '.pdf"',
     },
   });
 }
